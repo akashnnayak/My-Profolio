@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="weatherStyle.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <h1 class="app-title">🌍 Weather App</h1>
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off">
+            <button id="searchBtn">🔍 Search</button>
+        </div>
+        <div class="weather-info">
+            <h2 id="cityName">City Name</h2>
+            <img id="weatherIcon" src="" alt="Weather Icon">
+            <p id="temp">🌡️ Temperature: -- °C</p>
+            <p id="humidity">💧 Humidity: --%</p>
+            <p id="windSpeed">💨 Wind Speed: -- km/h</p>
+            <p id="weatherDesc">🌥️ Condition: --</p>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '7bb9fd615b6bd478c3b1e595537f5abd'; // Replace with your actual API key
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+    const city = document.getElementById('cityInput').value.trim();
+    if (city) {
+        getWeather(city);
+    } else {
+        alert("Please enter a city name!");
+    }
+});
+
+function getWeather(city) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.cod !== 200) {
+                alert("City not found!");
+                return;
+            }
+            displayWeather(data);
+        })
+        .catch(error => {
+            console.error("Error fetching weather:", error);
+            alert("Something went wrong. Try again later!");
+        });
+}
+
+function displayWeather(data) {
+    document.getElementById('cityName').textContent = data.name;
+    document.getElementById('temp').textContent = `🌡️ ${data.main.temp} °C`;
+    document.getElementById('humidity').textContent = `💧 Humidity: ${data.main.humidity}%`;
+    document.getElementById('windSpeed').textContent = `💨 Wind Speed: ${data.wind.speed} km/h`;
+    document.getElementById('weatherDesc').textContent = `🌥️ Condition: ${data.weather[0].description}`;
+
+    const iconCode = data.weather[0].icon;
+    document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${iconCode}.png`;
+
+    document.querySelector('.weather-info').style.display = 'block';
+
+    // Change Background Based on Weather
+    changeBackground(data.weather[0].main);
+}
+
+function changeBackground(weatherCondition) {
+    let bgColor;
+
+    switch (weatherCondition) {
+        case 'Clear':
+            bgColor = 'linear-gradient(135deg, #ffcc33, #ff9900)';
+            break;
+        case 'Clouds':
+            bgColor = 'linear-gradient(135deg, #4a69bb, #3b3b98)';
+            break;
+        case 'Rain':
+            bgColor = 'linear-gradient(135deg, #3742fa, #2f3542)';
+            break;
+        case 'Snow':
+            bgColor = 'linear-gradient(135deg, #dfe4ea, #f1f2f6)';
+            break;
+        case 'Thunderstorm':
+            bgColor = 'linear-gradient(135deg, #575fcf, #485460)';
+            break;
+        default:
+            bgColor = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+    }
+
+    document.body.style.background = bgColor;
+}
+
+    </script>
+</body>
+
+</html>
